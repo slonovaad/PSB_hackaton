@@ -13,7 +13,7 @@ imap.login(username, gmail_pass)
 
 imap.select("INBOX")
 
-status, messages = imap.search(None, "UNSEEN")
+status, messages = imap.search(None, "ALL")
 
 if messages[0]:
     unseen_ids = messages[0].split()
@@ -26,9 +26,9 @@ if messages[0]:
             else:
                 continue
 
-        letter_date = msg["Date"]
+        data = msg["Date"]
         letter_id = msg["Message-ID"]
-        letter_from = msg["From"]
+        name_and_mail = msg["From"]
 
         subject_header = decode_header(msg["Subject"])[0]
         heading = subject_header[0]
@@ -71,10 +71,10 @@ if messages[0]:
                         with open(filename, 'wb') as f:
                             f.write(file_data)
 
-        print(letter_date)
-        print(letter_from)
+        print(data)
+        print(name_and_mail)
         print(heading)
         print(text)
-        ans.append([letter_date, letter_from, heading, text])
+        ans.append([data, name_and_mail, heading, text])
         
 print(ans)
