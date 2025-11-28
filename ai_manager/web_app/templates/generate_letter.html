@@ -7,10 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    {% csrf_token %}
-
-    <p>{{ answer }}</p>
-<form action="/" method="POST">
+    <form action="/" method="POST">
         {% csrf_token %}
         {{ form.author.label}} : {{ form.author }} <br>
         {{ form.letter.label}} : {{ form.letter }} <br>
