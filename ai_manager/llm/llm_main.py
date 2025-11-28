@@ -1,5 +1,6 @@
 from openai import OpenAI
-from llm.constants import API_KEY, FOLDER_ID, MODEL, BASE_URL, BANK_EMPLOYEE_INSTRUCTIONS
+from llm.constants import API_KEY, FOLDER_ID, MODEL, BASE_URL
+from llm.bank_employee_constants import BANK_EMPLOYEE_INSTRUCTIONS
 
 
 def llm_bank_employee(query):
