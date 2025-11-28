@@ -5,10 +5,10 @@ import os
 
 ans = []
 
-def take_messege(mail: str, password: str):
+def take_messege():
     try:
-        gmail_pass = password
-        username = mail
+        gmail_pass = "izgu gpfq ipzq orkt"
+        username = "hacatontest@gmail.com"
         imap_server = "imap.gmail.com"
         imap = imaplib.IMAP4_SSL(imap_server)
         imap.login(username, gmail_pass)
@@ -91,4 +91,4 @@ def take_messege(mail: str, password: str):
             pass
     print(ans)
 
-take_messege("hacatontest@gmail.com", "izgu gpfq ipzq orkt")
+take_messege()
