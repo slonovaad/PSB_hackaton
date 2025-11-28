@@ -1,4 +1,4 @@
-from llm.constants import NOW_DATE, CATEGORIES, WEEKDAY
+from llm.constants import CATEGORIES
 
 EXAMPLES = ""
 with open(r"llm\llm_bank_employee\bank_employee_examples.txt", encoding="utf-8") as f:
@@ -25,7 +25,7 @@ BANK_EMPLOYEE_INSTRUCTIONS_GET_TYPE = f"""{BASE_PROMPT}
 Поля в json-файле:
 type - типы обращения, к которым пожно отнести письмо. Список, состоящий из одного или нескольких значений из набора: {CATEGORIES}
 
-Примеры распределения писем по типам обращения:
+Примеры писем с определённым типом обращения:
 {EXAMPLES}
 """
 BANK_EMPLOYEE_INSTRUCTIONS_MAKE_ANSWER = f"""{BASE_PROMPT}
@@ -37,7 +37,7 @@ BANK_EMPLOYEE_INSTRUCTIONS_MAKE_ANSWER = f"""{BASE_PROMPT}
 Напиши ответ на письмо.
 Подписывайся в письмах фразой "С уважением, ИИ-помощник ПСБ"
 Поля в json-файле:
-deadline - дата, до которой ориентировочно должен быть дан ответ с учётом того, какие дни недели рабочие - дата в формате дд.мм.гггг. (сегодняшняя дата: {NOW_DATE}, день недели: {WEEKDAY})
+deadline - срок, в течение которого должет быть дан ответ - дата в формате дд.мм.гггг. либо же строка в формате 'в течение n рабочих дней'
 answer - финальный текст ответного письма на русском языке без markdown-разметки. Вся информация должна быть уже заполнена.
 
 Примеры ответов на письма:

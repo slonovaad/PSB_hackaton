@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from datetime import date
 
 NOW_DATE = date.today().strftime("%d.%m.%Y")
-WEEKDAY = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"][date.today().weekday()]
 CATEGORIES = ["Запрос информации/документов",
               "Официальная жалоба или претензия",
               "Регуляторный запрос",
