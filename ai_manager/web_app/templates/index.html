@@ -18,8 +18,12 @@
 <body class="d-flex flex-column h-100">
     {% csrf_token %}
 <div class="container p-2 mt-5>">
-    <h5 class="mt-3">{{ answer }}</h5>
+    {% if is_post %}
+    <div class="mt-3"><h5>Срок ответа: до {{ deadline }}</h5></div>
+    <div class="mt-3"><h5>Тип обращения: {{ type }}</h5></div>
+    <div class="mt-3">{{ answer }}</div>
     <br>
+    {% endif %}
         <div class="form-group">
 <form action="/" method="POST">
         {% csrf_token %}

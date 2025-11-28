@@ -1,14 +1,15 @@
 from django.shortcuts import render
 from llm.llm_main import llm_bank_employee
 from web_app.forms import LetterForm
-from django.shortcuts import redirect
+import json
 
 # Create your views here.
 def index(request):
     query = ""
+    f = LetterForm()
     if request.method == "GET":
-        f = LetterForm()
-        query = request.GET.get('ask', 'Кто ты?')
+        #query = request.GET.get('ask', 'Кто ты?')
+        return render(request, "index.html", {"form": f, "is_post": False})
     if request.method == "POST":
         f = LetterForm(request.POST)
         if f.is_valid():
@@ -17,5 +18,11 @@ def index(request):
             query = f"Отправитель письма: {author}\n Текст письма: {letter}"
 
     res = llm_bank_employee(query)
-    context = {"answer": res, "form": f}
+    res = res.replace('`', '')
+    res = json.loads(res)
+    context = {"deadline": res["deadline"],
+               "answer": res["answer"],
+               "type": res["type"],
+               "form": f,
+               "is_post": True}
     return render(request, 'index.html', context)
