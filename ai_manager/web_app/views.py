@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from llm.llm_main import llm_bank_employee
+from llm.llm_bank_employee.llm_bank_employee import LlmBankEmployee
+from llm.llm_lawyer.llm_lawyer import LlmLawyer
 from web_app.forms import LetterForm
 import json
 
@@ -10,22 +11,29 @@ def index(request):
     f = LetterForm()
     author = ""
     letter = ""
+    bank_employee = LlmBankEmployee()
+    lawyer = LlmLawyer()
     if request.method == "GET":
-        # query = request.GET.get('ask', 'Кто ты?')
         return render(request, "index.html", {"form": f, "is_post": False})
     if request.method == "POST":
         f = LetterForm(request.POST)
         if f.is_valid():
             author = f.data['author']
             letter = f.data['letter']
-            query = f"Отправитель письма: {author}\n Текст письма: {letter}"
 
-    res = llm_bank_employee(query)
-    res = res.replace('`', '')
-    res = json.loads(res)
+    category = json.loads(bank_employee.get_type(author, letter).replace('`', ''))["type"]
+    lawyer_answer = json.loads(lawyer.check_correctness(author, letter, category) .replace('`', ''))
+    is_correct = lawyer_answer["is_correct"]
+    comment = lawyer_answer["comments"]
+    person_info = lawyer_answer["person_info"]
+    res = json.loads(bank_employee.make_answer(author, person_info, letter, category, is_correct, comment).replace('`', ''))
     context = {"deadline": res["deadline"],
                "answer": res["answer"],
-               "type": res["type"],
+               "is_correct": is_correct,
+               "comment": comment,
+               "laws": lawyer_answer["laws"],
+               "person_info": person_info,
+               "type": category,
                "form": f,
                "author": author,
                "letter": letter,

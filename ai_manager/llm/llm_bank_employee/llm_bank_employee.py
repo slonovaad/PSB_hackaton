@@ -1,0 +1,23 @@
+from openai import OpenAI
+from llm.constants import API_KEY, FOLDER_ID, MODEL, BASE_URL
+from llm.llm_bank_employee.bank_employee_constants import BANK_EMPLOYEE_INSTRUCTIONS_GET_TYPE, BANK_EMPLOYEE_INSTRUCTIONS_MAKE_ANSWER
+
+
+class LlmBankEmployee:
+    def __init__(self):
+        self.client = OpenAI(
+            base_url=BASE_URL,
+            api_key=API_KEY, project=FOLDER_ID)
+    def get_type(self, author, letter):
+        res = self.client.responses.create(model=MODEL,
+                                      instructions=BANK_EMPLOYEE_INSTRUCTIONS_GET_TYPE,
+                                      input=f"Отправитель письма: {author}\n Текст письма: {letter}")
+        return res.output_text
+    def make_answer(self, author, person_info, letter, category, is_correct, comment):
+        query = f"""Отправитель письма: {author}\n Информация об авторе: {person_info
+        }\n Текст письма: {letter}\n Тип обращения: {category
+        }\n Вердикт юриста: обращение {is_correct}\n Противоречия законодательству: {comment}"""
+        res = self.client.responses.create(model=MODEL,
+                                      instructions=BANK_EMPLOYEE_INSTRUCTIONS_MAKE_ANSWER,
+                                      input=query)
+        return res.output_text
