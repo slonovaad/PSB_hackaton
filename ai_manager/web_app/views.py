@@ -19,7 +19,3 @@ def index(request):
     res = llm_bank_employee(query)
     context = {"answer": res, "form": f}
     return render(request, 'index.html', context)
-
-def input_page(request):
-    context = {"form": LetterForm()}
-    return render(request, 'generate_letter.html', context)

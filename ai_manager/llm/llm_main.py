@@ -8,5 +8,5 @@ def llm_bank_employee(query):
         api_key=API_KEY, project=FOLDER_ID)
     res = client.responses.create(model=MODEL,
                                   instructions=BANK_EMPLOYEE_INSTRUCTIONS,
-                                  input=query)
+                                  input=query,)
     return res.output_text
