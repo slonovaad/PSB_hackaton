@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'web_app',
     'llm',
+    'mail_interactions'
 ]
 
 MIDDLEWARE = [
