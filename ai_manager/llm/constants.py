@@ -10,6 +10,16 @@ CATEGORIES = ["Запрос информации/документов",
               "Запрос на согласование",
               "Уведомление или информирование"]
 
+ROUTES = {"support": ["Служба поддержки клиентов", "Undefined"],
+          "claim": ["Отдел претензий и разбирательств", "Undefined"],
+          "tech": ["Техническая поддержка IT", "Undefined"],
+          "law": ["Юридический отдел", "Undefined"],
+          "security": ["Отдел безопасности", "Undefined"],
+          "cooperate": ["Департамент корпоративного бизнеса", "Undefined"],
+          "marketing": ["Департамент маркетинга и PR", "Undefined"],
+          "charity": ["Отдел благотворительности и ESG", "Undefined"],
+          "secretary": ["Канцелярия/Секретариат", "Undefined"],}
+
 load_dotenv()
 FOLDER_ID = os.environ['folder_id']
 API_KEY = os.environ['api_key']

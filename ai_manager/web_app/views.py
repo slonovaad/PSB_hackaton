@@ -1,6 +1,7 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.http import HttpResponseRedirect, JsonResponse
 from llm.llm_bank_employee.llm_bank_employee import LlmBankEmployee
+from llm.constants import ROUTES
 from llm.llm_lawyer.llm_lawyer import LlmLawyer
 from mail_interactions.imap import take_message
 from mail_interactions.cmpt import send_mail
@@ -43,9 +44,16 @@ def index(request):
     is_correct = lawyer_answer["is_correct"]
     comment = lawyer_answer["comments"]
     person_info = lawyer_answer["person_info"]
-
     person_name = lawyer_answer["person_name"]
     person_email = lawyer_answer["person_email"]
+    routing = json.loads(bank_employee.make_routes(author, person_info, letter, category, is_correct, comment).replace('`', ''))
+    routes_for_answer = ""
+    routing_letters = []
+    for key_name in routing:
+        reason = routing[key_name]['reason']
+        routes_for_answer += f"Отдел: {ROUTES[key_name][0]}\n Причина: {reason}\n"
+        routing_letters.append({"key_name": key_name, "name": ROUTES[key_name][0], "email": ROUTES[key_name][1],
+                                "routing_letter": routing[key_name]['routing_letter']})
     correspondence_context = ""
     letters_count = 0
     connected_senders = []
@@ -67,7 +75,7 @@ def index(request):
         correspondence_context = "Предыдущая переписка отсутствует"
     res = json.loads(
         bank_employee.make_answer(author, person_info, letter, category, is_correct, comment,
-                                  correspondence_context).replace('`', ''))
+                                  routes_for_answer, correspondence_context).replace('`', ''))
     context = {"deadline": res["deadline"],
                "answer": res["answer"],
                "answer_theme": res["answer_theme"],
@@ -80,6 +88,8 @@ def index(request):
                "form": f,
                "author": author,
                "letter": letter,
+               "routes": routing_letters,
+               "routing_theme": f"{category} от {author}",
                "is_post": True}
     return render(request, 'index.html', context)
 
@@ -89,6 +99,11 @@ def mail_sending(request):
         email = request.POST.get("email")
         theme = request.POST.get("theme")
         text = request.POST.get("text")
+        reload_flag = request.POST.get("reload", "true")
         send_mail(email, theme, text)
+
+
+        if reload_flag.lower() == "false":
+            return JsonResponse({'status': 'success'})
 
     return HttpResponseRedirect("/", )

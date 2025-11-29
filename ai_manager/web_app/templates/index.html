@@ -50,8 +50,14 @@
     <div class="row">
         <div class="col-md-8 col-lg-9 py-4">
             <div class="bg-white rounded shadow-sm p-4 mx-3">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <a class="btn btn-primary" href="{% url 'index' %}">К следующему письму</a>
+                    </div>
+                </div>
 
                 {% if is_post %}
+
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <h5 class="mb-2">Срок ответа: {{ deadline }}</h5>
@@ -72,20 +78,60 @@
                     <textarea class="form-control mb-3" rows="10" id="answer-letter"
                               name="answer-letter">{{ answer }}</textarea>
                     {% if person_email != "Undefined" %}
-                    <form id="send-email-form" action="{% url 'mail-sending' %}" method="POST" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="email" value="{{ person_email }}">
-                        <input type="hidden" name="theme" value="{{ answer_theme }}">
-                        <input type="hidden" name="text" id="hidden-text">
-                        <button type="submit" class="btn btn-primary">Отправить письмо</button>
-                    </form>
+                    <button type="button" class="btn btn-primary" id="send-main-email-btn" style="width: 50%;">
+                        Отправить письмо
+                    </button>
+                    <div id="send-main-status" class="mt-2"></div>
                     {% endif %}
                 </div>
                 <script>
-                document.getElementById('send-email-form').addEventListener('submit', function(e) {
-                    const answerText = document.getElementById('answer-letter').value;
-                    document.getElementById('hidden-text').value = answerText;
-                });
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const sendButton = document.getElementById('send-main-email-btn');
+                        if (sendButton) {
+                            sendButton.addEventListener('click', function() {
+                                const email = "{{ person_email }}";
+                                const theme = "{{ answer_theme }}";
+                                const text = document.getElementById('answer-letter').value;
+                                const statusDiv = document.getElementById('send-main-status');
+
+                                // Показываем индикатор загрузки
+                                statusDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Отправка...';
+                                sendButton.disabled = true;
+
+                                // Отправляем AJAX запрос
+                                fetch("{% url 'mail-sending' %}", {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                        'X-CSRFToken': '{{ csrf_token }}'
+                                    },
+                                    body: new URLSearchParams({
+                                        'email': email,
+                                        'text': text,
+                                        'theme': theme,
+                                        'reload': 'false'
+                                    })
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        statusDiv.innerHTML = '<span class="text-success">✓ Письмо отправлено успешно!</span>';
+                                        setTimeout(() => {
+                                            statusDiv.innerHTML = '';
+                                        }, 3000);
+                                    } else {
+                                        throw new Error('Ошибка отправки');
+                                    }
+                                })
+                                .catch(error => {
+                                    statusDiv.innerHTML = '<span class="text-danger">✗ Ошибка при отправке письма</span>';
+                                    console.error('Error:', error);
+                                })
+                                .finally(() => {
+                                    sendButton.disabled = false;
+                                });
+                            });
+                        }
+                    });
                 </script>
                 <hr>
                 <div class="row mt-3">
@@ -98,6 +144,75 @@
                     <h5>Связанные законы: {{ laws }}</h5>
                 </div>
                 <hr>
+                <div>
+                    {% for route in routes %}
+                    <div class="row mb-3">
+                        <label for="routing-letter-{{ route.key_name }}" class="form-label">Сгенерированное письмо в
+                            {{ route.name }}:</label>
+                        <textarea class="form-control mb-3" rows="10" id="routing-letter-{{ route.key_name }}"
+                                  name="outing-letter-{{ route.key_name }}">{{ route.routing_letter }}</textarea>
+                        {% if route.email != "Undefined" %}
+                        <button type="button" class="btn btn-primary send-email-btn"
+                                data-email="{{ route.email }}"
+                                data-textarea-id="routing-letter-{{ route.key_name }}"
+                                style="width: 50%;">
+                            Отправить письмо
+                        </button>
+                        <div id="status-{{ route.key_name }}" class="mt-2"></div>
+                        {% endif %}
+                    </div>
+                    <hr>
+                    {% endfor %}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            document.querySelectorAll('.send-email-btn').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    const email = this.getAttribute('data-email');
+                                    const textareaId = this.getAttribute('data-textarea-id');
+                                    const text = document.getElementById(textareaId).value;
+                                    const statusDiv = document.getElementById('status-' + textareaId.split('-').pop());
+
+
+                                    statusDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Отправка...';
+                                    button.disabled = true;
+
+
+                                    fetch("{% url 'mail-sending' %}", {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/x-www-form-urlencoded',
+                                            'X-CSRFToken': '{{ csrf_token }}'
+                                        },
+                                        body: new URLSearchParams({
+                                            'email': email,
+                                            'text': text,
+                                            'theme': '{{ routing_theme|default:"" }}',
+                                            'reload': 'false'
+                                        })
+                                    })
+                                    .then(response => {
+                                        if (response.ok) {
+                                            statusDiv.innerHTML = '<span class="text-success">✓ Письмо отправлено успешно!</span>';
+                                            setTimeout(() => {
+                                                statusDiv.innerHTML = '';
+                                            }, 3000);
+                                        } else {
+                                            throw new Error('Ошибка отправки');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        statusDiv.innerHTML = '<span class="text-danger">✗ Ошибка при отправке письма</span>';
+                                        console.error('Error:', error);
+                                    })
+                                    .finally(() => {
+                                        button.disabled = false;
+                                    });
+                                });
+                            });
+                        });
+                    </script>
+                </div>
+
                 {% endif %}
 
                 <form action="/" method="POST">
