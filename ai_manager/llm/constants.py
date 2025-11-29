@@ -10,15 +10,15 @@ CATEGORIES = ["Запрос информации/документов",
               "Запрос на согласование",
               "Уведомление или информирование"]
 
-ROUTES = {"support": ["Служба поддержки клиентов", "Undefined"],
-          "claim": ["Отдел претензий и разбирательств", "Undefined"],
-          "tech": ["Техническая поддержка IT", "Undefined"],
-          "law": ["Юридический отдел", "Undefined"],
-          "security": ["Отдел безопасности", "Undefined"],
-          "cooperate": ["Департамент корпоративного бизнеса", "Undefined"],
-          "marketing": ["Департамент маркетинга и PR", "Undefined"],
-          "charity": ["Отдел благотворительности и ESG", "Undefined"],
-          "secretary": ["Канцелярия/Секретариат", "Undefined"],}
+ROUTES = {"support": ["Служба поддержки клиентов", "superjorik2020@gmail.com"],
+          "claim": ["Отдел претензий и разбирательств", "vikabaz2007@gmail.com"],
+          "tech": ["Техническая поддержка IT", "hayko5687@gmail.com"],
+          "law": ["Юридический отдел", "haykosteam@gmail.com"],
+          "security": ["Отдел безопасности", "haykmechanic@gmail.com"],
+          "cooperate": ["Департамент корпоративного бизнеса", "mai.slonovaad@gmail.com"],
+          "marketing": ["Департамент маркетинга и PR", "hkeesteam@gmail.com"],
+          "charity": ["Отдел благотворительности и ESG", "hkeesteam9685@gmail.com"],
+          "secretary": ["Канцелярия/Секретариат", "hharmen007@gmail.com"],}
 
 load_dotenv()
 FOLDER_ID = os.environ['folder_id']
