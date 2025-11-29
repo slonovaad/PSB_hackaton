@@ -46,7 +46,6 @@
     </style>
 </head>
 <body class="bg-light">
-{% csrf_token %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-8 col-lg-9 py-4">
@@ -69,9 +68,25 @@
                 </div>
                 <hr>
                 <div class="row mb-3">
-                    <h5 class="mb-4">Сгенерированный ответ:</h5>
-                    <textarea class="form-control" rows="10">{{ answer }}</textarea>
+                    <label for="answer-letter" class="form-label">Сгенерированный ответ:</label>
+                    <textarea class="form-control mb-3" rows="10" id="answer-letter"
+                              name="answer-letter">{{ answer }}</textarea>
+                    {% if person_email != "Undefined" %}
+                    <form id="send-email-form" action="{% url 'mail-sending' %}" method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="email" value="{{ person_email }}">
+                        <input type="hidden" name="theme" value="{{ answer_theme }}">
+                        <input type="hidden" name="text" id="hidden-text">
+                        <button type="submit" class="btn btn-primary">Отправить письмо</button>
+                    </form>
+                    {% endif %}
                 </div>
+                <script>
+                document.getElementById('send-email-form').addEventListener('submit', function(e) {
+                    const answerText = document.getElementById('answer-letter').value;
+                    document.getElementById('hidden-text').value = answerText;
+                });
+                </script>
                 <hr>
                 <div class="row mt-3">
                     <h5>Корректность обращения: обращение {{ is_correct }}</h5>

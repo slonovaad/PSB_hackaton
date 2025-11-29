@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
 from llm.llm_bank_employee.llm_bank_employee import LlmBankEmployee
 from llm.llm_lawyer.llm_lawyer import LlmLawyer
 from mail_interactions.imap import take_message
+from mail_interactions.cmpt import send_mail
 from web_app.forms import LetterForm
 from web_app.models import Sender, Letter
-from mail_interactions import imap
 import json
 
 
@@ -18,17 +19,24 @@ def index(request):
     bank_employee = LlmBankEmployee()
     lawyer = LlmLawyer()
     if request.method == "GET":
-        last_mail = take_message("hacatontest@gmail.com", "izgu gpfq ipzq orkt")
-        if len(last_mail) == 0:
+        try:
+            last_mail = take_message("hacatontest@gmail.com", "izgu gpfq ipzq orkt")
+            if len(last_mail) == 0:
+                return render(request, "index.html", {"form": f, "is_post": False})
+            author = last_mail[1]
+            author = author[author.find('<') + 1:author.find('>')]
+            letter = f"Тема: {last_mail[2]}\n Текст: {last_mail[3]}"
+
+        except:
             return render(request, "index.html", {"form": f, "is_post": False})
-        author = last_mail[0][1]
-        author = author[author.find('<') + 1:author.find('>')]
-        letter = f"Тема: {last_mail[0][2]}\n Текст: {last_mail[0][3]}"
-    if request.method == "POST":
+
+    elif request.method == "POST":
         f = LetterForm(request.POST)
         if f.is_valid():
             author = f.data['author']
             letter = f.data['letter']
+    else:
+        return render(request, "index.html", {"form": f, "is_post": False})
 
     category = json.loads(bank_employee.get_type(author, letter).replace('`', ''))["type"]
     lawyer_answer = json.loads(lawyer.check_correctness(author, letter, category).replace('`', ''))
@@ -51,7 +59,8 @@ def index(request):
             correspondence_context += f"Письмо {letters_count}:\n {old_letter.text} \n"
     if len(connected_senders) == 0:
         Sender.objects.create(name=person_name, email=person_email)
-        connected_senders.append(Sender.objects.get(name=person_name, email=person_email))
+        for sender in Sender.objects.filter(name=person_name, email=person_email):
+            connected_senders.append(sender)
     for sender in connected_senders:
         Letter.objects.create(author=sender, text=letter)
     if len(correspondence_context) == 0:
@@ -61,9 +70,11 @@ def index(request):
                                   correspondence_context).replace('`', ''))
     context = {"deadline": res["deadline"],
                "answer": res["answer"],
+               "answer_theme": res["answer_theme"],
                "is_correct": is_correct,
                "comment": comment,
                "laws": lawyer_answer["laws"],
+               "person_email": person_email,
                "person_info": person_info,
                "type": category,
                "form": f,
@@ -71,3 +82,13 @@ def index(request):
                "letter": letter,
                "is_post": True}
     return render(request, 'index.html', context)
+
+
+def mail_sending(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        theme = request.POST.get("theme")
+        text = request.POST.get("text")
+        send_mail(email, theme, text)
+
+    return HttpResponseRedirect("/", )

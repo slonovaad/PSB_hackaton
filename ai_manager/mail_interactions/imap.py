@@ -3,10 +3,10 @@ import email
 from email.header import decode_header
 import os
 
-ans = []
 
 
 def take_message(mail: str, password: str):
+    ans = []
     """Функция, получающая и обрабатывающая последнее непрочитанное сообщение"""
     try:
         gmail_pass = password
@@ -91,7 +91,9 @@ def take_message(mail: str, password: str):
             imap.logout()
         except:
             pass
-    return ans
+    if len(ans) == 0:
+        return []
+    return ans[0]
 
 
 #take_message("hacatontest@gmail.com", "izgu gpfq ipzq orkt")
