@@ -2,6 +2,7 @@
 Хакатон AI Challenge
 
 # Запуск приложения:
+Для корректной работы должны быть установлены переменные окружения, необходимые для работы с Yandex Cloud
 ```
 pip install requirements.txt
 cd ai_manager
@@ -44,7 +45,7 @@ python manage.py ruserver
 ## Модуль llm
 
 ### Подмодуль llm_bank_employee
-Генерация промптов для имитации поведеления сторудника банка
+Генерация промптов для имитации поведеления сотрудника банка
 #### bank_employee_base_prompt.txt, bank_employee_examples.txt, bank_employee_routing_examples.txt, bank_employee_constants.py
 Файлы, хранящие тексты промптов (основной промпт, примеры, запись промпта в константы)
 #### llm_bank_employee.py
@@ -63,7 +64,7 @@ python manage.py ruserver
 - param: category: категория письма
 - param: is_correct: корректность письма с юридической точки зрения
 - param: comment: комментарий по наличию противоречий с законодательством или их отсутствии
-- return: ответ LLM (json с перечнем отделов, в которые необходимо перенапрвить, объяснением причины, текстами писем для отделов)"""
+- return: ответ LLM (json с перечнем отделов, в которые необходимо перенапрвить, объяснением причины, текстами писем для отделов)
 
 ##### make_answer(self, author: str, person_info: str, letter: str, category: str, is_correct: str, comment: str, routes: str, correspondence_context: str) -> str:
 Написание ответа на письмо
@@ -75,6 +76,18 @@ python manage.py ruserver
 - param: comment: комментарий по наличию противоречий с законодательством или их отсутствии
 - param: routes: информация о необходимости перенаправления в другие отделы
 - param: correspondence_context: информация о предыдущем контексте переписки с данным отправителем
-- return: ответ LLM (json с ответом на письмо)"""
+- return: ответ LLM (json с ответом на письмо)
 
 
+### Подмодуль llm_lawyer
+Генерация промптов для имитации поведеления юриста
+#### llm_lawyer_base_prompt.txt, llm_lawyer_examples.txt, llm_lawyer_constants.py
+Файлы, хранящие тексты промптов (основной промпт, примеры, запись промпта в константы)
+#### llm_lawyer.py
+Класс, содержащий функции - типы запросов (задач), которые обрабатывает юрист. Исходя из переданных аргументов и промпта создаётся запрос в LLM по API
+##### check_correctness(self, author: str, letter: str, category: str) -> str:
+Функция, проверяющая письмо на корректность с юридической точки зрения
+- param: author: автор письма
+- param: letter: текст письма
+- param: category: категория письма
+- return: ответ LLM (json с вердиктом о корректности письма, комментарием насчёт наличия противоречий с законодательством, перечнем связанных законов, найденной информации об авторе письма)
